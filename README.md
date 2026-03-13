@@ -64,13 +64,56 @@ cd ../../../
 ### Download Checkpoints
 
 We currently provide fine-tuned model weights for St4RTrack, which can be downloaded locally via [Google Drive](https://drive.google.com/drive/folders/1uSfnZbzqa8pfIb6k383-BerLQ0m9-R1l?usp=sharing). We recommand `St4RTrack_Seqmode_reweightMax5.pth` by default.
-Optionally, you can also load checkpoint via [Hugging Face](https://huggingface.co/yupengchengg147/St4rTrack)  by easily adding
-```python
+
+For a reproducible local Hugging Face snapshot, you can now download the checkpoint into `St4RTrack/checkpoints/`:
+```bash
+cd St4RTrack
+python download_checkpoint.py --variant seq
+# optional: pair checkpoint
+python download_checkpoint.py --variant pair --output_dir checkpoints/st4rtrack_pair
+```
+This prints a local directory that can be passed to `--weights`.
+
+Optionally, you can also load checkpoint via [Hugging Face](https://huggingface.co/yupengchengg147/St4rTrack) by adding
+```bash
 --hf_model "yupengchengg147/St4RTrack" \
 --hf_variant seq \
---hf_force_download #optional
+--hf_force_download   # optional
 ```
-in training and inference command.
+to training and inference commands.
+
+For the static-mesh bootstrap wrapper, the cold-start flow is:
+```bash
+cd St4RTrack
+python download_checkpoint.py --variant seq --output_dir checkpoints/st4rtrack_seq
+python export_static_mesh_inputs.py \
+  --input_dir /path/to/frames_or_video \
+  --output_dir /path/to/static_mesh_inputs \
+  --seq_name walking_camera_demo \
+  --weights checkpoints/st4rtrack_seq
+```
+If you do not want a local snapshot first, you can instead use on-demand Hugging Face loading:
+```bash
+python export_static_mesh_inputs.py \
+  --input_dir /path/to/frames_or_video \
+  --output_dir /path/to/static_mesh_inputs \
+  --seq_name walking_camera_demo \
+  --hf_model yupengchengg147/St4RTrack \
+  --hf_variant seq
+```
+
+For a one-command bootstrap from checkpoint to replay/mesh outputs, run from the repo root:
+```bash
+python -m static_mesh.cli.bootstrap_static_mesh \
+  --input_dir /path/to/frames_or_video \
+  --output_dir /path/to/bootstrap_run \
+  --seq_name walking_camera_demo \
+  --pose_source ground_truth \
+  --pose_input /path/to/ground_truth.npz \
+  --download_checkpoint \
+  --mesh_backend smoke
+```
+This creates `normalized/`, `camera_poses.npz`, and `static_mesh/summary.json + frames/` under the bootstrap output directory.
 
 ### Training
 
