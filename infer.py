@@ -7,6 +7,7 @@ import math
 from unittest import result
 import gradio
 import os
+import matplotlib
 import torch
 import numpy as np
 import tempfile
@@ -20,11 +21,14 @@ from dust3r.image_pairs import make_pairs
 from dust3r.utils.image import load_images, rgb, enlarge_seg_masks
 from dust3r.utils.device import to_numpy
 from dust3r.cloud_opt.oneref_viewer import oneref_viewer_wrapper
-import matplotlib.pyplot as pl
 import glob
 from tqdm import tqdm
 from dust3r.datasets.tapvid3d import load_npz_data
 import shutil
+
+if os.environ.get('MPLBACKEND') is None and not os.environ.get('DISPLAY'):
+    matplotlib.use('Agg', force=True)
+import matplotlib.pyplot as pl
 
 pl.ion()
 

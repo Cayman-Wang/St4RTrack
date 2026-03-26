@@ -1,7 +1,40 @@
 import os
 import re
+import json
 from copy import deepcopy
 from pathlib import Path
+
+import matplotlib
+if os.environ.get('MPLBACKEND') is None and not os.environ.get('DISPLAY'):
+    home_path = Path.home()
+    if not os.access(home_path, os.W_OK):
+        temp_home = Path('/tmp/st4rtrack_headless_home')
+        temp_home.mkdir(parents=True, exist_ok=True)
+        os.environ['HOME'] = str(temp_home)
+    os.environ['MPLBACKEND'] = 'Agg'
+    os.environ.setdefault('MPLCONFIGDIR', '/tmp/matplotlib')
+    settings_dir = Path.home() / '.evo'
+    settings_dir.mkdir(parents=True, exist_ok=True)
+    settings_path = settings_dir / 'settings.json'
+    from evo.tools.settings_template import DEFAULT_SETTINGS_DICT
+    if settings_path.exists():
+        try:
+            settings_payload = json.loads(settings_path.read_text())
+        except json.JSONDecodeError:
+            settings_payload = dict(DEFAULT_SETTINGS_DICT)
+    else:
+        settings_payload = dict(DEFAULT_SETTINGS_DICT)
+    needs_write = False
+    for key, value in DEFAULT_SETTINGS_DICT.items():
+        if key not in settings_payload:
+            settings_payload[key] = value
+            needs_write = True
+    if settings_payload.get('plot_backend') != 'Agg':
+        settings_payload['plot_backend'] = 'Agg'
+        needs_write = True
+    if needs_write:
+        settings_path.write_text(json.dumps(settings_payload, indent=4, sort_keys=True))
+    matplotlib.use('Agg', force=True)
 
 import evo.main_ape as main_ape
 import evo.main_rpe as main_rpe
