@@ -33,6 +33,8 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument('--num_frames', type=int, default=200)
     parser.add_argument('--fps', type=int, default=0)
     parser.add_argument('--mid_anchor', action='store_true', default=False)
+    parser.add_argument('--dynamic_prior_mode', default='off', choices=['off', 'pointodyssey_instance_motion'])
+    parser.add_argument('--mask_root', default=None, help='Optional mask directory override for pair sidecar generation.')
     parser.add_argument('extra_infer_args', nargs='*')
     return parser.parse_args()
 
@@ -57,6 +59,8 @@ def main() -> None:
         num_frames=args.num_frames,
         fps=args.fps,
         mid_anchor=args.mid_anchor,
+        dynamic_prior_mode=args.dynamic_prior_mode,
+        mask_root=args.mask_root,
         extra_infer_args=args.extra_infer_args,
     )
     print(f'Saved normalized manifest to {Path(args.output_dir) / "manifest.json"}')
