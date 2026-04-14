@@ -1,5 +1,7 @@
 # St4RTrack: Simultaneous 4D Reconstruction and Tracking in the World (ICCV 2025)
 
+> **LEGACY (2026-04-14)**: The `St4RTrack/` directory and its related adapters are preserved as a historical baseline. The current active mainline has switched to Track4World.
+
 <p align="center"> 
   <img alt="image" src="assets/teaser.png" />
 </p>
